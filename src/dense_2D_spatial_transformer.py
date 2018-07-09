@@ -21,15 +21,15 @@ class Dense2DSpatialTransformer(Layer):
             raise Exception('Spatial Transformer must be called on a list of length 2 or 3. '
                             'First argument is the image, second is the offset field.')
 
-        if len(input_shape[1]) != 5 or input_shape[1][4] != 2:
-            raise Exception('Offset field must be one 5D tensor with 2 channels. '
+        if len(input_shape[1]) != 4 or input_shape[1][4] != 2:
+            raise Exception('Offset field must be one 4D tensor with 2 channels. '
                             'Got: ' + str(input_shape[1]))
 
         self.built = True
 
     def call(self, inputs):
-        return self._transform(inputs[0], inputs[1][:, :, :, :, 0],
-                               inputs[1][:, :, :, :, 1]
+        return self._transform(inputs[0], inputs[1][:, :, :, 0],
+                               inputs[1][:, :, :, 1]
 
     def compute_output_shape(self, input_shape):
         return input_shape[0]
@@ -49,8 +49,8 @@ class Dense2DSpatialTransformer(Layer):
 
 
         #Once we convert, we then add the new tensor to the existing dx, dy
-        x_mesh = tf.tile(x_mesh, [batch_size, 1, 1, 1])
-        y_mesh = tf.tile(y_mesh, [batch_size, 1, 1, 1])
+        x_mesh = tf.tile(x_mesh, [batch_size, 1, 1])
+        y_mesh = tf.tile(y_mesh, [batch_size, 1, 1])
         x_new = dx + x_mesh
         y_new = dy + y_mesh
         return self._interpolate(I, x_new, y_new)
@@ -78,12 +78,12 @@ class Dense2DSpatialTransformer(Layer):
 
     def _interpolate(self, im, x, y):
 
-        im = tf.pad(im, [[0, 0], [1, 1], [1, 1], [1, 1], [0, 0]], "CONSTANT")
+        im = tf.pad(im, [[0, 0], [1, 1], [1, 1], [0, 0]], "CONSTANT")
 
         num_batch = tf.shape(im)[0]
         height = tf.shape(im)[1]
         width = tf.shape(im)[2]
-        channels = tf.shape(im)[4]
+        channels = tf.shape(im)[3]
 
         out_height = tf.shape(x)[1]
         out_width = tf.shape(x)[2]
