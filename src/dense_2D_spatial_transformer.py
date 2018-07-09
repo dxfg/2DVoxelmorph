@@ -1,7 +1,7 @@
 """
 voxelwarp
 
-3d spatial transformer 
+2d spatial transformer 
 """
 
 # third party
@@ -9,10 +9,12 @@ from keras.layers.core import Layer
 import tensorflow as tf
 
 
-class Dense3DSpatialTransformer(Layer):
+class Dense2DSpatialTransformer(Layer):
+
+    #Basic inits
 
     def __init__(self, **kwargs):
-        super(Dense3DSpatialTransformer, self).__init__(**kwargs)
+        super(Dense2DSpatialTransformer, self).__init__(**kwargs)
 
     def build(self, input_shape):
         if len(input_shape) > 3:
@@ -32,6 +34,8 @@ class Dense3DSpatialTransformer(Layer):
     def compute_output_shape(self, input_shape):
         return input_shape[0]
 
+
+    #Transform is applied
     def _transform(self, I, dx, dy):
 
         batch_size = tf.shape(dx)[0]
@@ -43,13 +47,15 @@ class Dense3DSpatialTransformer(Layer):
         x_mesh = tf.expand_dims(x_mesh, 0)
         y_mesh = tf.expand_dims(y_mesh, 0)
 
+
+        #Once we convert, we then add the new tensor to the existing dx, dy
         x_mesh = tf.tile(x_mesh, [batch_size, 1, 1, 1])
         y_mesh = tf.tile(y_mesh, [batch_size, 1, 1, 1])
         x_new = dx + x_mesh
         y_new = dy + y_mesh
-
         return self._interpolate(I, x_new, y_new)
 
+    #Repeating over all    
     def _repeat(self, x, n_repeats):
         rep = tf.transpose(
             tf.expand_dims(tf.ones(shape=tf.stack([n_repeats, ])), 1), [1, 0])

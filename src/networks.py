@@ -12,7 +12,7 @@ import keras
 import numpy as np
 
 # local
-from dense_3D_spatial_transformer import Dense3DSpatialTransformer
+from dense_2D_spatial_transformer import Dense2DSpatialTransformer
 import losses
 
 
@@ -71,7 +71,7 @@ def unet(vol_size, enc_nf, dec_nf, full_size=True):
                   kernel_initializer=RandomNormal(mean=0.0, stddev=1e-5), name='flow')(x)
 
     # warp the source with the flow
-    y = Dense3DSpatialTransformer()([src, flow])
+    y = Dense2DSpatialTransformer()([src, flow])
 
     # prepare model
     model = Model(inputs=[src, tgt], outputs=[y, flow])

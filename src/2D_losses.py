@@ -17,14 +17,12 @@ def gradientLoss(penalty='l1'):
     def loss(y_true, y_pred):
         dy = tf.abs(y_pred[:, 1:, :, :, :] - y_pred[:, :-1, :, :, :])
         dx = tf.abs(y_pred[:, :, 1:, :, :] - y_pred[:, :, :-1, :, :])
-        dz = tf.abs(y_pred[:, :, :, 1:, :] - y_pred[:, :, :, :-1, :])
 
         if (penalty == 'l2'):
             dy = dy * dy
             dx = dx * dx
-            dz = dz * dz
-        d = tf.reduce_mean(dx)+tf.reduce_mean(dy)+tf.reduce_mean(dz)
-        return d/3.0
+        d = tf.reduce_mean(dx)+tf.reduce_mean(dy)
+        return d/2.0
 
     return loss
 
