@@ -26,7 +26,7 @@ import losses
 
 
 vol_size = (160, 192, 224)
-base_data_dir = '/insert/your/path/here'
+base_data_dir = 'C:\Users\Sriram\Documents\2DVoxelmorph\images'
 train_vol_names = glob.glob(base_data_dir + 'train/vols/*.npz')
 random.shuffle(train_vol_names)
 
@@ -62,7 +62,7 @@ def train(model,save_name, gpu_id, lr, n_iterations, reg_param, model_save_iter)
     with tf.device(gpu):
         model = networks.unet(vol_size, nf_enc, nf_dec)
         model.compile(optimizer=Adam(lr=lr), loss=[
-                      losses.cc3D(), losses.gradientLoss('l2')], loss_weights=[1.0, reg_param])
+                      losses.cc2D(), losses.gradientLoss('l2')], loss_weights=[1.0, reg_param])
         # model.load_weights('../models/udrnet2/udrnet1_1/120000.h5')
 
     train_example_gen = datagenerators.example_gen(train_vol_names)
