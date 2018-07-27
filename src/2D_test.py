@@ -13,11 +13,8 @@ import cv2 as cv2
 from matplotlib import pyplot as pp
 
 # project
-sys.path.append('../ext/medipy-lib')
-#import medipy
-import revised_networks
-#from medipy.metrics import dice
-import datagenerators
+import 2D_networks
+import 2D_datagenerators
 
 
 def test(model_name, iter_num, gpu_id, vol_size=(1024,1024), nf_enc=[16,32,32,32], nf_dec=[32,32,32,32,32,16,16,2]):
@@ -37,7 +34,6 @@ def test(model_name, iter_num, gpu_id, vol_size=(1024,1024), nf_enc=[16,32,32,32
 
   atlas = np.load(r'../data/atlas_2D.npz')
   atlas_vol = atlas['atlas2D']
-  #atlas_seg = atlas['seg']
   atlas_vol = np.reshape(atlas_vol, (1,) + atlas_vol.shape+(1,))
 
   config = tf.ConfigProto()
@@ -47,7 +43,7 @@ def test(model_name, iter_num, gpu_id, vol_size=(1024,1024), nf_enc=[16,32,32,32
 
   # load weights of model
   with tf.device(gpu):
-    net = revised_networks.unet(vol_size, nf_enc, nf_dec)
+    net = 2D_networks.unet(vol_size, nf_enc, nf_dec)
     net.load_weights('../models/' + model_name +
                          '/' + str(iter_num) + '.h5')
 
@@ -55,7 +51,7 @@ def test(model_name, iter_num, gpu_id, vol_size=(1024,1024), nf_enc=[16,32,32,32
   yy = np.arange(vol_size[0])
   grid = np.rollaxis(np.array(np.meshgrid(xx, yy)), 0, 3)
 
-  X_vol = datagenerators.load_example_by_name(r'../src/test_images/test_image_1.npz')
+  X_vol = 2D_datagenerators.load_example_by_name(r'/Your image here/')
 
   with tf.device(gpu):
     pred = net.predict([X_vol[0], atlas_vol])
@@ -64,22 +60,18 @@ def test(model_name, iter_num, gpu_id, vol_size=(1024,1024), nf_enc=[16,32,32,32
   flow = pred[1][0, :, :, :]
 
   sample = flow+grid
-  #sample = np.stack((sample[:, :, 1]), 1)
 
   X_seg = np.zeros((1024,1024))
   X_seg = np.reshape(X_seg, (1,) + X_seg.shape + (1,))
 
   warp_seg = interpn((yy, xx), X_seg[0, :, :, 0], sample, method='nearest', bounds_error=False, fill_value=0)
-  
-  #vals, __ = dice(warp_seg, atlas_vol, labels=labels, nargout=2)
-  #print(np.mean(vals), np.std(vals))
 
   w = 10
   h = 10
   fig = pp.figure(figsize=(8, 8))
   columns = 3
   rows = 1
-  a = np.load(r'../src/test_images/test_image_1.npz')
+  a = np.load(r'/Your image here/')
   im_arr = a['image2D'] 
   fig.add_subplot(rows, columns, 1)
   pp.imshow(im_arr, cmap = 'gray')

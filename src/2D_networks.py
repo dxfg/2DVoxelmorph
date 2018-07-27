@@ -12,9 +12,8 @@ import keras
 import numpy as np
 
 # local
-#from dense_2D_spatial_transformer import Dense2DSpatialTransformer
-from new_dense_transform import new_dense_transform
-import losses
+from 2D_dense_transform import 2D_dense_transform
+import 2D_losses
 
 def unet(vol_size, enc_nf, dec_nf, full_size=True):
     """

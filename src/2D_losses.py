@@ -1,10 +1,6 @@
-
 # Third party inports
 import tensorflow as tf
 import numpy as np
-
-# batch_sizexheightxwidthxdepthxchan
-
 
 def diceLoss(y_true, y_pred):
     top = 2*tf.reduce_sum(y_true * y_pred, [1, 2, 3])
